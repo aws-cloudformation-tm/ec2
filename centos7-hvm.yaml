@@ -1,5 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
+Parameters:
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    ConstraintDescription: must be a valid EC2 instance type.
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
 Mappings:
   StackConfigs:
     VPC:
@@ -42,20 +53,27 @@ Resources:
       - Key: Name
         Value: !FindInMap [StackConfigs, PublicSubnet, Name]
 
-  myInstance:
+  centos7:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
       ImageId: ami-045f38c93733dd48d
-      InstanceType: t2.micro
-      KeyName: "centos7"
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
       SecurityGroupIds:
         - !Ref sshSG
+        - !Ref httpSG
       SubnetId:
         Ref: PublicSubnet
       Tags:
       - Key: Name
         Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: centos7
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
 
   sshSG:
     Type: AWS::EC2::SecurityGroup
@@ -67,6 +85,19 @@ Resources:
         FromPort: 22
         IpProtocol: tcp
         ToPort: 22
+      VpcId:
+        Ref: VPC
+
+  httpSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: http
+      GroupDescription: http access rule
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
       VpcId:
         Ref: VPC
 
@@ -105,7 +136,5 @@ Resources:
         Ref: PublicRouteTable
 
 Outputs:
-  Ec2PublicIp:
-    Value: !GetAtt myInstance.PublicIp
-  Ec2InstanceId:
-    Value: !Ref myInstance
+  VpcId:
+    Value: !Ref VPC
