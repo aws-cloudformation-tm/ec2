@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
+  ImageId:
+    Description: EC2 AMI id 
+    Type: String
+    Default: ami-045f38c93733dd48d 
+    ConstraintDescription: must be a valid EC2 AMI id.
   InstanceType:
     Description: EC2 instance type
     Type: String
@@ -62,7 +67,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId' 
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -89,7 +94,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -116,7 +121,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: t2.medium
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -143,7 +148,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -170,7 +175,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -197,7 +202,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -224,7 +229,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -251,7 +256,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -269,33 +274,6 @@ Resources:
       - Key: ansible_port
         Value: 22
 
-  nodejs:
-    Type: AWS::EC2::Instance
-    DependsOn: InternetGateway
-    Properties:
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            DeleteOnTermination: true
-            VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
-      InstanceType: !Ref 'InstanceType'
-      KeyName: !Ref 'KeyName'
-      SecurityGroupIds:
-        - !Ref sshSG
-        - !Ref httpSG
-      SubnetId:
-        Ref: PublicSubnet
-      Tags:
-      - Key: Name
-        Value: !Ref AWS::StackName
-      - Key: ansible_inventory_group_name
-        Value: nodejs
-      - Key: ansible_user
-        Value: centos
-      - Key: ansible_port
-        Value: 22
-
   plantumlserver:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
@@ -305,7 +283,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -323,33 +301,6 @@ Resources:
       - Key: ansible_port
         Value: 22
 
-  redmine:
-    Type: AWS::EC2::Instance
-    DependsOn: InternetGateway
-    Properties:
-      BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            DeleteOnTermination: true
-            VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
-      InstanceType: !Ref 'InstanceType'
-      KeyName: !Ref 'KeyName'
-      SecurityGroupIds:
-        - !Ref sshSG
-        - !Ref httpSG
-      SubnetId:
-        Ref: PublicSubnet
-      Tags:
-      - Key: Name
-        Value: !Ref AWS::StackName
-      - Key: ansible_inventory_group_name
-        Value: redmine
-      - Key: ansible_user
-        Value: centos
-      - Key: ansible_port
-        Value: 22
-
   vncserver:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
@@ -359,7 +310,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
