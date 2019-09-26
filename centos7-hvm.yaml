@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
+  ImageId:
+    Description: EC2 AMI id
+    Type: String
+    Default: ami-045f38c93733dd48d
+    ConstraintDescription: must be a valid EC2 AMI id.
   InstanceType:
     Description: EC2 instance type
     Type: String
@@ -62,7 +67,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: ami-045f38c93733dd48d
+      ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
