@@ -1,10 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Parameters:
-  ImageId:
-    Description: EC2 AMI id 
+  ImageIdLocal:
+    Description: EC2 AMI id
     Type: String
-    Default: ami-045f38c93733dd48d 
+    Default: ami-045f38c93733dd48d
+    ConstraintDescription: must be a valid EC2 AMI id.
+  ImageIdSsh:
+    Description: EC2 AMI id
+    Type: String
+    Default: ami-045f38c93733dd48d
     ConstraintDescription: must be a valid EC2 AMI id.
   InstanceType:
     Description: EC2 instance type
@@ -58,7 +63,7 @@ Resources:
       - Key: Name
         Value: !FindInMap [StackConfigs, PublicSubnet, Name]
 
-  ansible:
+  ansibleLocal:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -67,7 +72,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId' 
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -79,13 +84,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: ansible
+        Value: ansible_local
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  awscli:
+  ansibleSsh:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -94,7 +99,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdSsh'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -106,13 +111,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: awscli
+        Value: ansible_ssh
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  awx:
+  awscliLocal:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -121,7 +126,61 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdLocal'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: awscli_local
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  awscliSsh:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: awscli_ssh
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  awxLocal:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: t2.medium
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -133,13 +192,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: awx
+        Value: awx_local
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  chrome:
+  awxSsh:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -148,7 +207,34 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: t2.medium
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: awx_ssh
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  chromeLocal:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -160,13 +246,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: chrome
+        Value: chrome_local
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  docker:
+  chromeSsh:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -175,7 +261,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdSsh'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -187,13 +273,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: docker
+        Value: chrome_ssh
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  exa:
+  dockerLocal:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -202,7 +288,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -214,13 +300,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: exa
+        Value: docker_local
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  httpd:
+  dockerSsh:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -229,7 +315,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdSsh'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -241,13 +327,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: httpd
+        Value: docker_ssh
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  jenkins:
+  exaLocal:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -256,7 +342,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -268,13 +354,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: jenkins
+        Value: exa_local
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  plantumlserver:
+  exaSsh:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -283,7 +369,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdSsh'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -295,13 +381,13 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: plantumlserver
+        Value: exa_ssh
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
         Value: 22
 
-  vncserver:
+  jenkinsLocal:
     Type: AWS::EC2::Instance
     DependsOn: InternetGateway
     Properties:
@@ -310,7 +396,7 @@ Resources:
           Ebs:
             DeleteOnTermination: true
             VolumeType: gp2
-      ImageId: !Ref 'ImageId'
+      ImageId: !Ref 'ImageIdLocal'
       InstanceType: !Ref 'InstanceType'
       KeyName: !Ref 'KeyName'
       SecurityGroupIds:
@@ -322,7 +408,142 @@ Resources:
       - Key: Name
         Value: !Ref AWS::StackName
       - Key: ansible_inventory_group_name
-        Value: vncserver
+        Value: jenkins_local
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  jenkinsSsh:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: jenkins_ssh
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  plantumlserverLocal:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdLocal'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: plantumlserver_local
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  plantumlserverSsh:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: plantumlserver_ssh
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  vncserverLocal:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdLocal'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: vncserver_local
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  vncserverSsh:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: vncserver_ssh
       - Key: ansible_user
         Value: centos
       - Key: ansible_port
