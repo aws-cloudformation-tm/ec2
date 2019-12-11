@@ -15,6 +15,11 @@ Parameters:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instances
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
+  VolumeSize:
+    Default: 8
+    Description: EC2 Ebs volume size
+    Type: Number
+    MinValue: 8
 
 Mappings:
   StackConfigs:
@@ -66,6 +71,7 @@ Resources:
         - DeviceName: /dev/sda1
           Ebs:
             DeleteOnTermination: true
+            VolumeSize: !Ref 'VolumeSize'
             VolumeType: gp2
       ImageId: !Ref 'ImageId'
       InstanceType: !Ref 'InstanceType'
