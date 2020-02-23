@@ -549,6 +549,60 @@ Resources:
       - Key: ansible_port
         Value: 22
 
+  wordpressLocal:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdLocal'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: wordpress_local
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
+  wordpressSsh:
+    Type: AWS::EC2::Instance
+    DependsOn: InternetGateway
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            DeleteOnTermination: true
+            VolumeType: gp2
+      ImageId: !Ref 'ImageIdSsh'
+      InstanceType: !Ref 'InstanceType'
+      KeyName: !Ref 'KeyName'
+      SecurityGroupIds:
+        - !Ref sshSG
+        - !Ref httpSG
+      SubnetId:
+        Ref: PublicSubnet
+      Tags:
+      - Key: Name
+        Value: !Ref AWS::StackName
+      - Key: ansible_inventory_group_name
+        Value: wordpress_ssh
+      - Key: ansible_user
+        Value: centos
+      - Key: ansible_port
+        Value: 22
+
   sshSG:
     Type: AWS::EC2::SecurityGroup
     Properties:
